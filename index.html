@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3rd Monthsary Celebration</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; min-height: 100%; background: #090909; color: #fff; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif; overflow: hidden; }
+    button { font: inherit; }
+    .screen { position: absolute; inset: 0; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; padding: 32px; text-align: center; transition: opacity 0.5s ease, visibility 0.5s ease; opacity: 0; visibility: hidden; }
+    .screen.active { opacity: 1; visibility: visible; }
+    .glass-card { width: min(520px, 100%); background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 32px; backdrop-filter: blur(24px); box-shadow: 0 28px 80px rgba(0,0,0,0.35); padding: 42px 34px; }
+    h1, h2 { margin: 0; line-height: 1.1; }
+    h1 { font-size: clamp(2.2rem, 4vw, 4rem); letter-spacing: -0.04em; }
+    h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); }
+    p { margin: 18px 0 0; color: rgba(255,255,255,0.82); font-size: 1rem; line-height: 1.7; }
+    .button { margin-top: 30px; padding: 16px 28px; border: none; border-radius: 999px; color: #fff; background: #111; cursor: pointer; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 18px 40px rgba(0,0,0,0.25); }
+    .button:hover { transform: translateY(-2px); background: #000; }
+    .confirm-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 30px; }
+    .red-screen { background: #660000; }
+    .light-blue { position: relative; overflow: hidden; background: #ffd8e8; color: #35153d; min-height: 100vh; }
+    .audio-player { margin-top: 28px; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.85); border-radius: 24px; padding: 20px; color: #35153d; backdrop-filter: blur(18px); }
+    .audio-player p { margin: 0 0 12px; font-size: 0.95rem; color: #5f2f5e; }
+    .audio-player audio { width: 100%; border-radius: 16px; }
+    .emoji-cloud { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .emoji-float { position: absolute; font-size: 1.2rem; opacity: 0.95; animation: floatUp 5s linear infinite; transform: translate3d(0,0,0); }
+    .image-cloud { position: absolute; inset: 0; pointer-events: auto; overflow: hidden; z-index: 1; }
+    .heart-cloud { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 2; }
+    .heart-float { position: absolute; font-size: 1.5rem; color: #ff5fa8; text-shadow: 0 0 12px rgba(255,95,168,0.45); opacity: 0.9; animation: heartDrift 5.5s ease-in-out infinite; }
+    .floating-img { position: absolute; width: 110px; height: 110px; border-radius: 24px; overflow: hidden; background: rgba(255,255,255,0.08); border: 3px solid rgba(255,255,255,0.75); box-shadow: 0 22px 50px rgba(0,0,0,0.16); display: flex; align-items: center; justify-content: center; color: #4a194f; font-size: 2.2rem; font-weight: 900; text-align: center; opacity: 0.95; animation: drift 4.5s linear infinite alternate; cursor: grab; user-select: none; touch-action: none; }
+    .floating-img img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+    .floating-img.dragging { animation: none !important; cursor: grabbing; z-index: 3; }
+    .photo-booth { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 30px; }
+    .slot { min-height: 160px; border-radius: 26px; border: 4px solid rgba(16, 42, 67, 0.16); background: rgba(255,255,255,0.85); display: flex; align-items: center; justify-content: center; color: #0d3b66; font-weight: 700; font-size: 0.98rem; }
+    .slot::before { content: "Photo slot"; }
+    .letter { position: relative; z-index: 5; background: rgba(255,255,255,0.16); border-radius: 32px; border: 1px solid rgba(255,255,255,0.85); padding: 28px; color: #35153d; box-shadow: 0 30px 70px rgba(16, 42, 67, 0.16); backdrop-filter: blur(28px); background-clip: padding-box; }
+    .letter p { margin: 1rem 0 0; color: #5f2f5e; font-size: 1rem; line-height: 1.75; }
+    @keyframes floatUp { 0% { transform: translate(0, 0) rotate(0deg); opacity: 1; } 25% { transform: translate(calc(var(--dx) * 0.1), -70px) rotate(30deg); opacity: 0.9; } 50% { transform: translate(calc(var(--dx) * -0.1), -140px) rotate(180deg); opacity: 0.7; } 75% { transform: translate(calc(var(--dx) * 0.15), -210px) rotate(260deg); opacity: 0.4; } 100% { transform: translate(calc(var(--dx) * 0.2), -280px) rotate(360deg); opacity: 0.1; } }
+    @keyframes heartDrift { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 25% { transform: translate(12px, -40px) scale(1.05); opacity: 0.95; } 50% { transform: translate(-8px, -90px) scale(1.1); opacity: 0.8; } 75% { transform: translate(6px, -120px) scale(1.05); opacity: 0.65; } 100% { transform: translate(-14px, -160px) scale(0.95); opacity: 0.45; } }
+    @keyframes drift { 0% { transform: translate(0, 0) rotate(0deg); } 25% { transform: translate(calc(var(--dx) * 0.4), calc(var(--dy) * 0.3)) rotate(8deg); } 50% { transform: translate(calc(var(--dx) * -0.3), calc(var(--dy) * 0.7)) rotate(-6deg); } 75% { transform: translate(calc(var(--dx) * 0.6), calc(var(--dy) * -0.5)) rotate(10deg); } 100% { transform: translate(var(--dx), var(--dy)) rotate(-8deg); } }
+    .sticker--one { top: 16%; left: 8%; background: linear-gradient(135deg, #ffe3e3 0%, #ffbbd7 100%); }
+    .sticker--two { bottom: 12%; right: 10%; width: 140px; height: 140px; background: linear-gradient(135deg, #cfe8ff 0%, #91d7ff 100%); }
+    .sticker span { display: block; margin-top: 6px; font-size: 0.84rem; letter-spacing: 0.01em; }
+    .floating { position: absolute; font-size: 5rem; animation: float 3s ease-in-out infinite; }
+    .floating--pray { top: 18%; right: 14%; }
+    .floating--heart { top: 18%; right: 14%; transform: scale(1.05); }
+    .preview-overlay { position: fixed; inset: 0; z-index: 50; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.45); backdrop-filter: blur(8px); }
+    .preview-overlay.visible { display: flex; }
+    .preview-card { width: min(420px, 90%); max-width: 420px; padding: 26px; border-radius: 32px; background: rgba(255,255,255,0.94); box-shadow: 0 34px 90px rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.9); backdrop-filter: blur(18px); position: relative; }
+    .preview-card-inner { min-height: 260px; border-radius: 24px; background: linear-gradient(145deg, #ffe8f6 0%, #ffcce3 100%); color: #4a194f; font-size: 1.1rem; font-weight: 800; text-align: center; padding: 24px; }
+    .close-preview { position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; border: none; border-radius: 50%; background: rgba(0,0,0,0.08); color: #35153d; font-size: 1.25rem; cursor: pointer; }
+    .shake { animation: shake 0.25s ease-in-out infinite alternate; }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-18px); } }
+    @keyframes shake { 0% { transform: translate(0,0); } 100% { transform: translate(4px,0); } }
+  </style>
+</head>
+<body>
+  <div class="screen active" id="screen1">
+    <div class="glass-card">
+      <button class="button" onclick="gotoConfirm()">Click me</button>
+    </div>
+  </div>
+
+  <div class="screen red-screen" id="screen2">
+    <div class="glass-card">
+      <h2>lab ko nimo</h2>
+      <p>Do you want to continue to the next screen?</p>
+      <div class="confirm-grid">
+        <button class="button" onclick="handleDecision(true)">yissyiss</button>
+        <button class="button" onclick="handleDecision(false)">dili</button>
+      </div>
+    </div>
+    <div class="emoji-cloud" id="emojiCloud"></div>
+    <div class="floating floating--pray" id="prayEmoji">🙏</div>
+  </div>
+
+  <div class="screen light-blue" id="screen3">
+    <div class="glass-card letter">
+      <h2>Happy 3rd Monthsary</h2>
+      <p>Every moment with you feels like a collection of bright memories. Enjoy this music track below.</p>
+      <p>It’s been officially 3 months with you, and almost a year nata nagkaila ksjshshhshsjshshshhshshs</p>
+      <p>I just want to say thank you so very much for staying this long, and I truly hope we’ll keep going for so much longer. Thank you for all the gifts na superr ka daghan, for always choosing me everyday, and for all the effort and love you always give me. I really really really appreciate everything. I love you so veryyy much babiii</p>
+      <p>Wishing us more months together, good health, and a stronger, happier relationship🫶🫶🫶</p>
+      <div id="audioContainer" class="audio-player"></div>
+    </div>
+    <div class="image-cloud" id="imageCloud"></div>
+    <div class="heart-cloud" id="heartCloud"></div>
+  </div>
+
+  <div class="preview-overlay" id="previewOverlay">
+    <div class="preview-card">
+      <button class="close-preview" onclick="closePreview()">×</button>
+      <div class="preview-card-inner" id="previewContent">Preview</div>
+    </div>
+  </div>
+
+  <script>
+    const images = [
+      "0e97c6c8-a1ef-49a8-83ee-6bca13073934.jpg",
+      "17d3b9f7-ceef-4b49-b860-df57d0709ec6.jpg",
+      "44902257-4692-4a57-8c87-f66440267e9f.jpg",
+      "58e06ba8-3173-4209-891c-36163beee2ca.jpg",
+      "5f05dd5d-4464-4a54-8602-1a56dbcc5eaf.jpg",
+      "88896203-55bd-418b-94a8-d70bcc3bacbd.jpg",
+      "91aa6aa7-37cb-4ac8-b194-a452e47269e4.jpg",
+      "99273fe5-617d-4060-8a32-bbca9afe1b0f.jpg",
+      "9cdd0006-0d6a-4ac2-8500-37777da707ac.jpg",
+      "a21750f4-a235-417b-ba8a-a7e06588343c.jpg",
+      "c87e0cfa-58c3-44dc-a48c-4918b83d6200.jpg",
+      "ea8fd57e-ac72-4be8-9133-49dcc64a52a7.jpg"
+    ];
+
+    function gotoConfirm() {
+      document.getElementById('screen1').classList.remove('active');
+      document.getElementById('screen2').classList.add('active');
+      populateEmojiCloud();
+    }
+
+    function populateEmojiCloud() {
+      const container = document.getElementById('emojiCloud');
+      if (container.children.length > 0) return;
+      const count = 50;
+      for (let i = 0; i < count; i += 1) {
+        const emoji = document.createElement('div');
+        emoji.className = 'emoji-float';
+        emoji.textContent = '🙏';
+        const size = 14 + Math.random() * 18;
+        const left = Math.random() * 100;
+        const top = 60 + Math.random() * 35;
+        const dx = (Math.random() - 0.5) * 200;
+        const duration = 4 + Math.random() * 3;
+        const delay = Math.random() * -5;
+        emoji.style.left = `${left}%`;
+        emoji.style.top = `${top}%`;
+        emoji.style.fontSize = `${size}px`;
+        emoji.style.setProperty('--dx', `${dx}px`);
+        emoji.style.animationDuration = `${duration}s`;
+        emoji.style.animationDelay = `${delay}s`;
+        emoji.style.opacity = `${0.6 + Math.random() * 0.4}`;
+        container.appendChild(emoji);
+      }
+    }
+
+    function populateImageCloud() {
+      const container = document.getElementById('imageCloud');
+      if (container.children.length > 0) return;
+
+      const count = 12;
+      for (let i = 0; i < count; i += 1) {
+        const image = document.createElement('div');
+        image.className = 'floating-img';
+        const img = document.createElement('img');
+        img.src = `../${images[i]}`;
+        img.alt = `Photo`;
+        img.draggable = false;
+        image.appendChild(img);
+        const left = 6 + Math.random() * 84;
+        const top = 10 + Math.random() * 72;
+        const dx = (Math.random() - 0.5) * 260;
+        const dy = (Math.random() - 0.5) * 220;
+        const duration = 4 + Math.random() * 4;
+        const delay = Math.random() * -4;
+        image.style.left = `${left}%`;
+        image.style.top = `${top}%`;
+        image.style.setProperty('--dx', `${dx}px`);
+        image.style.setProperty('--dy', `${dy}px`);
+        image.style.animationDuration = `${duration}s`;
+        image.style.animationDelay = `${delay}s`;
+        image.style.zIndex = Math.random() > 0.5 ? '3' : '0';
+        image.dataset.inFront = image.style.zIndex === '3';
+        image.addEventListener('pointerdown', startDrag);
+        image.addEventListener('pointerup', endDrag);
+        image.addEventListener('pointercancel', endDrag);
+        image.addEventListener('click', () => showPreview(i + 1));
+        container.appendChild(image);
+      }
+      startImageZIndexToggle();
+    }
+
+    function startImageZIndexToggle() {
+      setInterval(() => {
+        const images = document.querySelectorAll('.floating-img:not(.dragging)');
+        images.forEach(img => {
+          const currentZ = img.style.zIndex;
+          img.style.zIndex = currentZ === '3' ? '4' : '3';
+        });
+      }, 3000);
+    }
+
+    let draggingImage = null;
+    let dragOffset = { x: 0, y: 0 };
+
+    function startDrag(event) {
+      event.preventDefault();
+      draggingImage = event.currentTarget;
+      const rect = draggingImage.getBoundingClientRect();
+      dragOffset.x = event.clientX - rect.left;
+      dragOffset.y = event.clientY - rect.top;
+      draggingImage.classList.add('dragging');
+      draggingImage.setPointerCapture(event.pointerId);
+    }
+
+    function endDrag(event) {
+      if (!draggingImage) return;
+      draggingImage.classList.remove('dragging');
+      draggingImage.releasePointerCapture(event.pointerId);
+      draggingImage = null;
+    }
+
+    document.addEventListener('pointermove', (event) => {
+      if (!draggingImage) return;
+      const container = document.getElementById('screen3');
+      const bounds = container.getBoundingClientRect();
+      const x = event.clientX - bounds.left - dragOffset.x;
+      const y = event.clientY - bounds.top - dragOffset.y;
+      const maxX = Math.max(0, bounds.width - draggingImage.offsetWidth);
+      const maxY = Math.max(0, bounds.height - draggingImage.offsetHeight);
+      draggingImage.style.left = `${Math.min(Math.max(0, x), maxX)}px`;
+      draggingImage.style.top = `${Math.min(Math.max(0, y), maxY)}px`;
+    });
+
+    function gotoNextScreen() {
+      document.getElementById('screen2').classList.remove('active');
+      document.getElementById('screen3').classList.add('active');
+      populateImageCloud();
+      populateHeartCloud();
+      startMusic();
+    }
+
+    function startMusic() {
+            const audio = document.createElement('audio');
+            audio.src = "../ivspdstb.mp3";
+            audio.type = "audio/mpeg";
+            audio.controls = false;
+            audio.autoplay = true;
+            audio.loop = true;
+            audio.play();
+            document.getElementById('audioContainer').appendChild(audio);
+    }
+
+    function populateHeartCloud() {
+      const container = document.getElementById('heartCloud');
+      if (container.children.length > 0) return;
+      const count = 14;
+      for (let i = 0; i < count; i += 1) {
+        const heart = document.createElement('div');
+        heart.className = 'heart-float';
+        heart.textContent = '❤';
+        const size = 16 + Math.random() * 14;
+        const left = 6 + Math.random() * 88;
+        const top = 35 + Math.random() * 55;
+        const duration = 4.5 + Math.random() * 3;
+        const delay = Math.random() * -5;
+        const driftX = (Math.random() - 0.5) * 40;
+        heart.style.left = `${left}%`;
+        heart.style.top = `${top}%`;
+        heart.style.fontSize = `${size}px`;
+        heart.style.animationDuration = `${duration}s`;
+        heart.style.animationDelay = `${delay}s`;
+        heart.style.setProperty('--dx', `${driftX}px`);
+        container.appendChild(heart);
+      }
+    }
+
+    function showPreview(index) {
+      const overlay = document.getElementById('previewOverlay');
+      const content = document.getElementById('previewContent');
+      content.innerHTML = `<div class="preview-card-inner"><img src="../${images[index-1]}" alt="Photo" style="width:100%; height:100%; object-fit:cover;" /></div>`;
+      overlay.classList.add('visible');
+    }
+
+    function closePreview() {
+      document.getElementById('previewOverlay').classList.remove('visible');
+    }
+
+    document.getElementById('previewOverlay')?.addEventListener('click', (event) => {
+      if (event.target.id === 'previewOverlay') closePreview();
+    });
+
+    function handleDecision(confirmed) {
+      const screen2 = document.getElementById('screen2');
+      const emoji = document.getElementById('prayEmoji');
+      if (confirmed) {
+        screen2.style.background = '#a71a1a';
+        emoji.textContent = '💖';
+        emoji.classList.remove('shake');
+        setTimeout(gotoNextScreen, 450);
+      } else {
+        screen2.style.background = '#550000';
+        emoji.textContent = '🙏';
+        emoji.classList.add('shake');
+      }
+    }
+  </script>
+</body>
+</html>
